@@ -42,10 +42,10 @@ import gr.auth.ee.dsproject.crush.util.BoardUtils;
  * -public PlayerMove getPlayerMove()
  * -public double evaluate()
  * -public Set<Tile> initialCandiesRemoved()
- * -public int countChainedCandiesRemoved(Board currentBoard)																			   
+ * -public double countChainedCandiesRemoved(Board currentBoard)																			   
  * 
  * @author Dimitrios Karageorgiou
- * @version 0.3
+ * @version 0.4
  */
 public class CandiesRemovedHeuristic extends Heuristic {
 
