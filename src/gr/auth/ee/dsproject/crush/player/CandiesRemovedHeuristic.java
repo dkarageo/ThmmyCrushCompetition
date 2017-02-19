@@ -24,11 +24,12 @@ import gr.auth.ee.dsproject.crush.util.BoardUtils;
  * "double score = heur.evaluate();"
  * 
  * Score of evaluate() method is defined in the following way:
- * -4.0 points for the first 6 candies
- * -2.0 points for the following 8 candies
- * -1.0 points for the following 10 candies
- * -50.0/remaining_candies for the following candies remaining.   
- * To a total of a 100.0 score. 
+ * -1.0 point for every candy removed by the initial player move.
+ * -1.0 + (CHAINED_INCREMENT * chained_round) for every candy removed
+ *  by a chained move. 
+ * chained_round is how deep a chained move happened. For chained
+ * moves just after the initial player's move, it's 1. For the moves
+ * just after it's 2 and so on.
  * 
  * Public constructors defined in CandiesRemovedHeuristic:
  * -public CandiesRemovedHeuristic()
@@ -47,7 +48,14 @@ import gr.auth.ee.dsproject.crush.util.BoardUtils;
  * @version 0.3
  */
 public class CandiesRemovedHeuristic extends Heuristic {
+
+// ==== Public Constants ====
+	/**
+	 * The increment of multiplier on every next round of chained moves. 
+	 */
+    public static final double CHAINED_INCREMENT = 0.5; 	
 	
+    
 // ==== Instance Variables ====
 	
 	/**
@@ -125,55 +133,30 @@ public class CandiesRemovedHeuristic extends Heuristic {
 	/**
 	 * Calculates a score based on the number of candies the player's
 	 * move specified by move instance variable will cause to be removed
-	 * from the board. It counts  both candies to be removed immediately 
+	 * from the board. It counts both candies to be removed immediately 
 	 * after player's move and candies to be removed by the following 
 	 * chained moves.
 	 * 
 	 * The score is formed in the following way:
-	 * -4.0 points for the first 6 candies
-	 * -2.0 points for the following 8 candies
-	 * -1.0 points for the following 10 candies
-	 * -50.0/remaining_candies for the following candies remaining.   
-	 * To a total of a 100.0 score.
+     * -1.0 point for every candy removed by the initial player move.
+     * -1.0 + (CHAINED_INCREMENT * chained_round) for every candy removed
+     *  by a chained move. 
+     *  chained_round is how deep a chained move happened. For chained
+     *  moves just after the initial player's move, it's 1. For the moves
+     *  just after it's 2 and so on. 
 	 * 
-	 * @return A score between 0 and 100.0 based on the removed tiles.  
+	 * @return A score based on the removed tiles.  
 	 */
 	public double evaluate() {
 		double score = 0;
-		int overallCandiesRemoved = 0;
 		
 		// Calculate the tiles removed directly by player's move.
-		overallCandiesRemoved += initialCandiesRemoved().size();
+		score += initialCandiesRemoved().size();
 		
 		// Calculate the tiles removed by chained moves.
-		overallCandiesRemoved += countChainedCandiesRemoved(
-				CrushUtilities.boardAfterFirstCrush(board, move.toDirArray())
+		score += calculateChainedMovesScore(
+				CrushUtilities.boardAfterFirstCrush(board, move.toDirArray()), 1.0
 		);
-		
-		if (overallCandiesRemoved > 6) {
-			score += 6.0 * 4.0;
-		} else if (overallCandiesRemoved > 0) {
-			score += ((double) overallCandiesRemoved) * 4.0;
-		}
-		overallCandiesRemoved -= 6;
-		
-		if (overallCandiesRemoved > 8) {
-			score += 8.0 * 2.0;
-		} else if (overallCandiesRemoved > 0) {
-			score += ((double) overallCandiesRemoved) * 2.0;
-		}
-		overallCandiesRemoved -= 8;
-		
-		if (overallCandiesRemoved > 10) {
-			score += 10.0 * 1.0;
-		} else if (overallCandiesRemoved > 0) {
-			score += ((double) overallCandiesRemoved) * 1.0;
-		}
-		overallCandiesRemoved -= 10;
-		
-		if (overallCandiesRemoved > 0) {
-			score += ((double) overallCandiesRemoved) * (50.0 / ((double) board.getRows() * board.getCols()));
-		}
 		
 		return score;
 	}
@@ -251,22 +234,32 @@ public class CandiesRemovedHeuristic extends Heuristic {
 	}
 	
 	/**
-	 * Recursively count the number of candies removed from the board
-	 * by chained moves.
+	 * Recursively calculates score of candies removed by chained moves
+	 * on the given board based on the given base.
+	 *  
+	 * On every run of calculateChainedMovesScore(), base is incremented by 
+	 * CHAINED_INCREMENT constant and number of candies to be removed is
+	 * multiplied by the final value. Thus, on every round of chained moves,
+	 * every removed title scores as following:
+	 * """
+	 *   chained_moves_round_score = (previous_base + CHAINED_INCREMENT) * 
+	 *                                chained_candies_removed_on_this_round  
+	 * """
 	 * 
 	 * Normally, countChainedCandiesRemoved method should be called with
 	 * the state of the board just after the initial removal of candies 
-	 * caused by the actual player's move. 
+	 * caused by the actual player's move with a base of 1.0. 
 	 * 
 	 * @param currentBoard A board object representing the state just after
 	 * 					   the actual player's move has been done, meaning
 	 * 					   that no candies based on chained moves should have
 	 * 					   been removed.
-	 * @return The overall number of candies removed by chained moves. Ranges
-	 * 		   from 0 to "currentBoard.getCols() * currentBoard.getRows() - 
-	 * 		   candiesRemovedByInitialMove". 
+	 * @param base The base multiplier which is going to be incremented by
+	 *             CHAINED_INCREMENT value and multiplied by the number of
+	 *             removed candies to form the final score.
+	 * @return The overall score of candies removed by chained moves.
 	 */
-	public int countChainedCandiesRemoved(Board board) 
+	public double calculateChainedMovesScore(Board board, double base) 
 	{
 		// Find the tiles that can be removed from the board, i.e. they crush. 
 	    Set<Tile> tilesForRemoval = BoardUtils.findAllNPles(board);
@@ -277,7 +270,9 @@ public class CandiesRemovedHeuristic extends Heuristic {
 		// chained moves have become available. Upon no removal, no chained
 		// moves are possible since board hasn't changed at all.
 		if (tilesForRemoval.size() > 2) {
-			return tilesForRemoval.size() + countChainedCandiesRemoved(board);
+			double multiplier = base + CHAINED_INCREMENT;
+			return tilesForRemoval.size() * multiplier + 
+				   calculateChainedMovesScore(board, multiplier);
 		} else {
 			return 0;
 		}

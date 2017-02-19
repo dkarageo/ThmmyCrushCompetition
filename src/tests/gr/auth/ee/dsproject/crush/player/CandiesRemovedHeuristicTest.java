@@ -197,7 +197,7 @@ public class CandiesRemovedHeuristicTest {
 	}
 		
 	@Test
-	public void testCountChainedCandiesRemovedOneDeep() {
+	public void testCalculateChainedMovesScoreOneDeep() {
 		int[][] boardScheme = {
 				{ 0, 1, 2, 3, 3, 5, 4, 4, 1, 2 },
 				{ 1, 3, 3, 4, 4, 6, 4, 1, 2, 3 },
@@ -227,15 +227,17 @@ public class CandiesRemovedHeuristicTest {
 		removed.remove(board.giveTileAt(6, 8));
 		removed.add(board.giveTileAt(5, 8));
 		
-		// Now calculate the actual chained moves.
+		// Now calculate the actual score of chained moves.
 		Board afterCrush = CrushUtilities.boardAfterFirstCrush(board, move.toDirArray());
-		int chainCount = heur.countChainedCandiesRemoved(afterCrush);
+		double score = heur.calculateChainedMovesScore(afterCrush, 1.0);
 		
-		assertEquals(4, chainCount);
+		double expectedScore = 4 * (1.0 + CandiesRemovedHeuristic.CHAINED_INCREMENT);
+		
+		assertEquals(expectedScore, score, 0.001);
 	}
 	
 	@Test
-	public void testCountChainedCandiesRemovedTwoDeep() {
+	public void testCalculateChainedMovesScoreTwoDeep() {
 		int[][] boardScheme = {
 				{ 0, 1, 2, 3, 4, 5, 6, 0, 1, 2 },
 				{ 1, 2, 3, 4, 4, 6, 4, 1, 2, 3 },
@@ -267,13 +269,16 @@ public class CandiesRemovedHeuristicTest {
 		
 		Board afterCrush = CrushUtilities.boardAfterFirstCrush(board, move.toDirArray());
 		
-		int chainCount = heur.countChainedCandiesRemoved(afterCrush);
+		double score = heur.calculateChainedMovesScore(afterCrush, 1.0);
 		
-		assertEquals(6, chainCount);
+		double expectedScore = 3 * (1.0 + CandiesRemovedHeuristic.CHAINED_INCREMENT) + 
+				   			   3 * (1.0 + CandiesRemovedHeuristic.CHAINED_INCREMENT * 2);
+		
+		assertEquals(expectedScore, score, 0.001);
 	}
 	
 	@Test
-	public void testCountChainedCandiesRemovedThreeDeep() {
+	public void testCalculateChainedMovesScoreThreeDeep() {
 		int[][] boardScheme = {
 				{ 0, 1, 2, 3, 4, 5, 6, 0, 1, 2 },
 				{ 1, 2, 3, 4, 4, 6, 4, 1, 2, 3 },
@@ -305,9 +310,13 @@ public class CandiesRemovedHeuristicTest {
 		
 		Board afterCrush = CrushUtilities.boardAfterFirstCrush(board, move.toDirArray());
 		
-		int chainCount = heur.countChainedCandiesRemoved(afterCrush);
+		double score = heur.calculateChainedMovesScore(afterCrush, 1.0);
 		
-		assertEquals(9, chainCount);
+		double expectedScore = 3 * (1.0 + CandiesRemovedHeuristic.CHAINED_INCREMENT) + 
+							   3 * (1.0 + CandiesRemovedHeuristic.CHAINED_INCREMENT * 2) +
+							   3 * (1.0 + CandiesRemovedHeuristic.CHAINED_INCREMENT * 3);	
+		
+		assertEquals(expectedScore, score, 0.001);
 	}
 	
 	@Test
@@ -330,9 +339,9 @@ public class CandiesRemovedHeuristicTest {
 		
 		CandiesRemovedHeuristic heur = new CandiesRemovedHeuristic(move, board);
 		
-		double score = 6 * 4.0 + 1 * 2.0;
+		double score = 3 * 1.0 + 4 * (1.0 + CandiesRemovedHeuristic.CHAINED_INCREMENT);
 		
-		assertEquals(score, heur.evaluate(), 0.1);
+		assertEquals(score, heur.evaluate(), 0.001);
 	}
 	
 	@Test
@@ -355,9 +364,11 @@ public class CandiesRemovedHeuristicTest {
 		
 		CandiesRemovedHeuristic heur = new CandiesRemovedHeuristic(move, board);
 		
-		double score = 6 * 4.0 + 3 * 2.0;
+		double score = 3 * 1.0 + 
+					   3 * (1.0 + CandiesRemovedHeuristic.CHAINED_INCREMENT) +
+					   3 * (1.0 + CandiesRemovedHeuristic.CHAINED_INCREMENT * 2);
 		
-		assertEquals(score, heur.evaluate(), 0.1);
+		assertEquals(score, heur.evaluate(), 0.001);
 	}
 	
 	@Test
@@ -380,9 +391,12 @@ public class CandiesRemovedHeuristicTest {
 		
 		CandiesRemovedHeuristic heur = new CandiesRemovedHeuristic(move, board);
 		
-		double score = 6 * 4.0 + 6 * 2.0;
+		double score = 3 * 1.0 + 
+				   	   3 * (1.0 + CandiesRemovedHeuristic.CHAINED_INCREMENT) +
+				       3 * (1.0 + CandiesRemovedHeuristic.CHAINED_INCREMENT * 2) +
+				       3 * (1.0 + CandiesRemovedHeuristic.CHAINED_INCREMENT * 3);
 		
-		assertEquals(score, heur.evaluate(), 0.1);
+		assertEquals(score, heur.evaluate(), 0.001);
 	}
 	
 	
@@ -406,15 +420,15 @@ public class CandiesRemovedHeuristicTest {
 		
 		CandiesRemovedHeuristic heur = new CandiesRemovedHeuristic(move, board);
 		
-		double score = 3 * 4.0;
+		double score = 3 * 1.0;
 		
-		assertEquals(score, heur.evaluate(), 0.1);
+		assertEquals(score, heur.evaluate(), 0.001);
 	}
 	
 	@Test
 	public void testEvaluateOnBoardWithPreviousHolesHorizontal() {
 		int[][] boardScheme = {
-				{ 0, 1, 2, 3,-1, -1,-1, 0, 1, 2 },
+				{ 0, 1, 2, 3,-1,-1,-1, 0, 1, 2 },
 				{ 1, 2, 3, 4, 4, 6, 4, 1, 2, 3 },
 				{ 5, 3, 4, 5, 5, 0, 5, 2, 3, 4 },
 				{ 3, 4, 5, 6, 0, 1, 2, 3, 4, 5 },
@@ -431,9 +445,11 @@ public class CandiesRemovedHeuristicTest {
 		
 		CandiesRemovedHeuristic heur = new CandiesRemovedHeuristic(move, board);
 		
-		double score = 6 * 4.0 + 3 * 2.0;
+		double score = 3 * 1.0 + 
+			   	   	   3 * (1.0 + CandiesRemovedHeuristic.CHAINED_INCREMENT) +
+			           3 * (1.0 + CandiesRemovedHeuristic.CHAINED_INCREMENT * 2);
 		
-		assertEquals(score, heur.evaluate(), 0.1);
+		assertEquals(score, heur.evaluate(), 0.001);
 	}
 	
 //==== Tests for legacy code ====
