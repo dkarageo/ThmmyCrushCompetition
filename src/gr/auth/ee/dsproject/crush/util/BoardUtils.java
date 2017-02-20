@@ -3,6 +3,7 @@ package gr.auth.ee.dsproject.crush.util;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.TreeSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Comparator;
@@ -17,6 +18,8 @@ import gr.auth.ee.dsproject.crush.board.Tile;
  * 
  * Static public methods defined in BoardUtils:
  * 
+ * -public static boolean containsAFiveLineOrAnL(Set<Tile> tiles) 
+		throws NullTileRuntimeException
  * -public Set<Tile> findAdjacentSameColorTiles(Board board, Tile currentTile, int dirMax)
  *		throws NullBoardRuntimeException, NullTileRuntimeException
  * -public static Set<Tile> findAllNPles(Board board) 
@@ -31,6 +34,7 @@ import gr.auth.ee.dsproject.crush.board.Tile;
  * 
  * Comparators defined in BoardUtils:
  * -public class TileFirstByYThenByX implements Comparator<Tile> 
+ * -public static class CordsFirstByYThenByX implements Comparator<int[]>
  *  
  * Exceptions defined in BoardUtils:
  * -public static class NullBoardRuntimeException extends RuntimeException
@@ -39,7 +43,7 @@ import gr.auth.ee.dsproject.crush.board.Tile;
  * -public static class NullMoveRuntimeException extends RuntimeException
  * 
  * @author Dimitrios Karageorgiou
- * @version 0.3
+ * @version 0.4
  */
 public class BoardUtils {
 	
@@ -54,6 +58,69 @@ public class BoardUtils {
 	
 	
 // ==== Public Methods ====
+	
+	/**
+	 * Checks whether the given tiles set contains tiles that forms a
+	 * line of at least five or an L scheme of at least five.
+	 * 
+	 * Checks are not color dependent.
+	 * 
+	 * If tiles argument is a null reference a NullTileRuntimeException
+	 * is thrown.
+	 * 
+	 * @param tiles A set of tiles to be checked for continuous schemes
+	 * 				of at least five tiles.
+	 * @return True if at least a five scheme can be formed, else false.
+	 * @throws NullTileRuntimeException
+	 */
+	public static boolean containsAFiveLineOrAnL(Set<Tile> tiles) 
+			throws NullTileRuntimeException
+	{
+		if (tiles == null) throw new NullTileRuntimeException();
+		
+		// Convert tiles set to a set containing just the cords set to easy query it.
+		TreeSet<int[]> cords = new TreeSet<>(new CordsFirstByYThenByX()); 
+		
+		for (Tile t : tiles) {
+			int[] c = { t.getX(), t.getY() };
+			cords.add(c);
+		}
+		
+		boolean fiveScheme = false;  // Indicates that a valid scheme of 5 tiles found.
+				
+		for (int[] c : cords) {
+			
+			for (int direction : DIRECTIONS) {
+				// Check linearly for adjacent tiles, until no more adjacent
+				// or when five tiles have already been found so no reason to
+				// go further.
+				int adjacent = countAdjacentCordsInDirection(cords, c, direction, 5);
+				
+				// If five adjacent tiles have been found linearly, then job
+				// done.
+				if (adjacent >= 5) {
+					fiveScheme = true;
+					break;
+				}
+				
+				// If three adjacent tiles have been found linearly,
+				// maybe another two tiles can be found after the corner.
+				if (adjacent == 3) {
+					// Get the 3rd item where linear search stopped.
+					int[] cornerCord = getNextCords(getNextCords(c, direction), direction); 
+					
+					if (countMaxAdjacentCordsAfterCorner(cords, cornerCord, direction, 3) > 2) {
+						fiveScheme = true;
+						break;
+					}
+				}
+			}
+			
+			if (fiveScheme) break; // A five scheme found. No need to continue.
+		}
+		
+		return fiveScheme;
+	}
 	
 	/**
 	 * Searches the given board for tiles adjacent to the one given one, 
@@ -340,7 +407,54 @@ public class BoardUtils {
 		
 		return crushTiles;
 	}
-
+	
+	/**
+	 * Returns the adjacent cords to the given ones, to the given direction.
+	 * 
+	 * If a direction not defined in CrushUtilities is provided, an
+	 * InvalidDirectionsRuntimeException is thrown. 
+	 *  
+	 * @param cords An int array representing 2D cords, int the form of [x, y]. 
+	 * @param direction The direction towards the adjacent cords should be
+	 * 					calculated, as defined in CrushUtilities.
+	 * @return The cords of the adjacent point to the given one, towards
+	 *         the given direction, in the form of [x, y] int array.
+	 * @throws InvalidDirectionsRuntimeException
+	 */
+	public static int[] getNextCords(int[] cords, int direction) 
+			throws InvalidDirectionsRuntimeException
+	{
+		// Create the current cord increment values according to the direction
+		// given.
+		int xIncr = 0;
+		int yIncr = 0;
+			
+		switch(direction) {
+		case CrushUtilities.UP:
+			yIncr = 1;
+			break;
+				
+		case CrushUtilities.DOWN:
+			yIncr = -1;
+			break;
+			
+		case CrushUtilities.LEFT:
+			xIncr = -1;
+			break;
+		
+		case CrushUtilities.RIGHT:
+			xIncr = 1;
+			break;
+			
+		default:
+			throw new InvalidDirectionsRuntimeException();
+		}
+		
+		int[] newCords = { cords[0] + xIncr, cords[1] + yIncr };
+		
+		return newCords;
+	}	
+	
 	/**
 	 * Checks whether the given cords are between boundaries of
 	 * the board, as returned by board.getCols() and 
@@ -416,7 +530,38 @@ public class BoardUtils {
 		}
 	}
 	
-
+	/**
+	 * Comparator that compares two int arrays representing cords in the form
+	 * of [x, y].
+	 * 
+	 * It first compares by y and returns:
+	 * -1 if y1 < y2
+	 *  1 if y1 > y2
+	 *  
+	 * If y1 == y1, then it compares by x and returns:
+	 * -1 if x1 < x2
+	 *  1 if x1 > x2
+	 *  
+	 * If x1 == x2 && y1 == y2 it returns 0.
+	 */
+	public static class CordsFirstByYThenByX implements Comparator<int[]> {
+		public int compare(int[] c1, int[] c2) {
+			int x1 = c1[0];
+			int x2 = c2[0];
+			int y1 = c1[1];
+			int y2 = c2[1];
+			
+			if (y1 > y2) return 1;
+			else if (y1 < y2) return -1;
+			else {
+				if (x1 > x2) return 1;
+				else if (x1 < x2) return -1;
+				else return 0;
+			}
+		}
+	}
+	
+	
 // ==== Exceptions defined in BoardUtils ====
 	
 	/**
@@ -450,7 +595,58 @@ public class BoardUtils {
 	public static class InvalidDirectionsRuntimeException extends RuntimeException {
 		private static final long serialVersionUID = 1L;
 	}
+
 	
+// ==== Private methods defined in BoardUtils ====	
+	
+	/**
+	 * 
+	 * @param cords
+	 * @param curCord
+	 * @param direction
+	 * @param limit
+	 * @return
+	 */
+	private static int countAdjacentCordsInDirection(
+			TreeSet<int[]> cords, int[] curCord, int direction, int limit) 
+	{
+		int adjacent = 0;
+		int[] nextCord = curCord;
+		
+		while (cords.contains(nextCord) && adjacent < limit) {
+			adjacent++;
+			nextCord = getNextCords(nextCord, direction);
+		}
+		
+		return adjacent;
+	}
+	
+	/**
+	 * 
+	 * @param cords
+	 * @param curCord
+	 * @param direction
+	 * @param limit
+	 * @return
+	 */
+	private static int countMaxAdjacentCordsAfterCorner(
+			TreeSet<int[]> cords, int[] curCord, int direction, int limit)
+	{		
+		int[] cDirections = new int[2];
+		
+		if (direction == CrushUtilities.UP || direction == CrushUtilities.DOWN) {
+			cDirections[0] = CrushUtilities.LEFT;
+			cDirections[1] = CrushUtilities.RIGHT;
+		}
+		else {
+			cDirections[0] = CrushUtilities.UP;
+			cDirections[1] = CrushUtilities.DOWN;
+		}
+		
+		return Math.max(countAdjacentCordsInDirection(cords, curCord, cDirections[0], limit),
+						countAdjacentCordsInDirection(cords, curCord, cDirections[1], limit));
+	}
+		
 	
 // ==== Legacy Code ====
 	

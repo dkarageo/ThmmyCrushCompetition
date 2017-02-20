@@ -64,9 +64,133 @@ public class BoardUtilsTest {
 		
 		noMoveBoard = createBoard(noMoveBoardScheme);		
 	}
-
+	
 	@After
 	public void tearDown() throws Exception {
+	}
+	
+	@Test
+	public void testContainsAFiveLineOrAnLOnVerticalLine() {
+		HashSet<Tile> tiles = new HashSet<>();
+		tiles.add(noMoveBoard.giveTileAt(3, 8));
+		tiles.add(noMoveBoard.giveTileAt(3, 7));
+		tiles.add(noMoveBoard.giveTileAt(3, 6));
+		tiles.add(noMoveBoard.giveTileAt(3, 5));
+		tiles.add(noMoveBoard.giveTileAt(3, 4));
+		
+		assertTrue(BoardUtils.containsAFiveLineOrAnL(tiles));
+	}
+	
+	@Test
+	public void testContainsAFiveLineOrAnLOnTwoVerticalLines() {
+		HashSet<Tile> tiles = new HashSet<>();
+		tiles.add(noMoveBoard.giveTileAt(3, 8));
+		tiles.add(noMoveBoard.giveTileAt(3, 7));
+		tiles.add(noMoveBoard.giveTileAt(3, 6));
+		tiles.add(noMoveBoard.giveTileAt(3, 5));
+		tiles.add(noMoveBoard.giveTileAt(3, 4));
+		tiles.add(noMoveBoard.giveTileAt(5, 4));
+		tiles.add(noMoveBoard.giveTileAt(5, 3));
+		tiles.add(noMoveBoard.giveTileAt(5, 2));
+		tiles.add(noMoveBoard.giveTileAt(5, 1));
+		tiles.add(noMoveBoard.giveTileAt(5, 0));
+		
+		assertTrue(BoardUtils.containsAFiveLineOrAnL(tiles));
+	}
+	
+	@Test
+	public void testContainsAFiveLineOrAnLOnAHorizontalLine() {
+		HashSet<Tile> tiles = new HashSet<>();
+		tiles.add(noMoveBoard.giveTileAt(3, 6));
+		tiles.add(noMoveBoard.giveTileAt(4, 6));
+		tiles.add(noMoveBoard.giveTileAt(5, 6));
+		tiles.add(noMoveBoard.giveTileAt(6, 6));
+		tiles.add(noMoveBoard.giveTileAt(7, 6));
+		
+		assertTrue(BoardUtils.containsAFiveLineOrAnL(tiles));
+	}
+	
+	@Test
+	public void testContainsAFiveLineOrAnLOnTwoHorizontalLines() {
+		HashSet<Tile> tiles = new HashSet<>();
+		tiles.add(noMoveBoard.giveTileAt(3, 6));
+		tiles.add(noMoveBoard.giveTileAt(4, 6));
+		tiles.add(noMoveBoard.giveTileAt(5, 6));
+		tiles.add(noMoveBoard.giveTileAt(6, 6));
+		tiles.add(noMoveBoard.giveTileAt(7, 6));
+		tiles.add(noMoveBoard.giveTileAt(5, 6));
+		tiles.add(noMoveBoard.giveTileAt(6, 6));
+		tiles.add(noMoveBoard.giveTileAt(7, 6));
+		tiles.add(noMoveBoard.giveTileAt(8, 6));
+		tiles.add(noMoveBoard.giveTileAt(9, 6));
+		
+		assertTrue(BoardUtils.containsAFiveLineOrAnL(tiles));
+	}
+	
+	@Test
+	public void testContainsAFiveLineOrAnLOnLeftCornerL() {
+		HashSet<Tile> tiles = new HashSet<>();
+		tiles.add(noMoveBoard.giveTileAt(0, 9));
+		tiles.add(noMoveBoard.giveTileAt(0, 8));
+		tiles.add(noMoveBoard.giveTileAt(0, 7));
+		tiles.add(noMoveBoard.giveTileAt(1, 9));
+		tiles.add(noMoveBoard.giveTileAt(2, 9));
+		
+		assertTrue(BoardUtils.containsAFiveLineOrAnL(tiles));
+	}
+	
+	@Test
+	public void testContainsAFiveLineOrAnLOnRightCornerL() {
+		HashSet<Tile> tiles = new HashSet<>();
+		tiles.add(noMoveBoard.giveTileAt(7, 9));
+		tiles.add(noMoveBoard.giveTileAt(9, 8));
+		tiles.add(noMoveBoard.giveTileAt(9, 7));
+		tiles.add(noMoveBoard.giveTileAt(8, 9));
+		tiles.add(noMoveBoard.giveTileAt(9, 9));
+		
+		assertTrue(BoardUtils.containsAFiveLineOrAnL(tiles));
+	}
+	
+	@Test
+	public void testContainsAFiveLineOrAnLWithABottomRightCornerL() {
+		HashSet<Tile> tiles = new HashSet<>();
+		tiles.add(noMoveBoard.giveTileAt(7, 0));
+		tiles.add(noMoveBoard.giveTileAt(8, 0));
+		tiles.add(noMoveBoard.giveTileAt(9, 0));
+		tiles.add(noMoveBoard.giveTileAt(9, 1));
+		tiles.add(noMoveBoard.giveTileAt(9, 2));
+		
+		assertTrue(BoardUtils.containsAFiveLineOrAnL(tiles));
+	}
+	
+	@Test
+	public void testContainsAFiveLineOrAnLWithABottomLeftCornerL() {
+		HashSet<Tile> tiles = new HashSet<>();
+		tiles.add(noMoveBoard.giveTileAt(0, 2));
+		tiles.add(noMoveBoard.giveTileAt(0, 1));
+		tiles.add(noMoveBoard.giveTileAt(0, 0));
+		tiles.add(noMoveBoard.giveTileAt(1, 0));
+		tiles.add(noMoveBoard.giveTileAt(2, 0));
+		
+		assertTrue(BoardUtils.containsAFiveLineOrAnL(tiles));
+	}
+	
+	@Test
+	public void testContainsAFiveLineOrAnLWithAnLAndAVerticalLine() {
+		HashSet<Tile> tiles = new HashSet<>();
+		tiles.add(noMoveBoard.giveTileAt(3, 5));
+		tiles.add(noMoveBoard.giveTileAt(4, 5));
+		tiles.add(noMoveBoard.giveTileAt(5, 5));
+		tiles.add(noMoveBoard.giveTileAt(5, 4));
+		tiles.add(noMoveBoard.giveTileAt(5, 3));
+		
+		tiles.add(noMoveBoard.giveTileAt(8, 9));
+		tiles.add(noMoveBoard.giveTileAt(8, 8));
+		tiles.add(noMoveBoard.giveTileAt(8, 7));
+		tiles.add(noMoveBoard.giveTileAt(8, 6));
+		tiles.add(noMoveBoard.giveTileAt(8, 5));
+		
+		assertTrue(BoardUtils.containsAFiveLineOrAnL(tiles));
 	}
 	
 	@Test
