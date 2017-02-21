@@ -159,7 +159,22 @@ public class MinMaxPlayer implements AbstractPlayer {
     	// is the root node, and for every move it's effect is calculated
     	// on the next run. 
     	n.evaluate(maximizing);
-    	    	
+    	
+    	// It counts total depth, considering every extra turn. If it
+    	// exceeds MINIMAX_DEPTH + 2, it just cuts off further searching
+    	// no matter what.
+    	Node parent = n.getParent();
+    	if (parent != null) {
+	    	int totalDepth = parent.getNodeDepth() + 1;
+    		n.setNodeDepth(totalDepth);
+	    	if (totalDepth > MINIMAX_DEPTH + 2) {
+	    		depth = 0; // Cut Off
+	    		
+	    		// DEBUG
+	    		System.out.println("Cut Off");
+	    	}	
+    	}
+	    	
     	// If current node is not a leaf, then evaluate its children,
     	// and form the overall evaluation by using the ones from deeper
     	// levels.
