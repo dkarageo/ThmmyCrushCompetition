@@ -101,6 +101,8 @@ public class MinMaxPlayer implements AbstractPlayer {
      */
     public int[] getNextMove(ArrayList<int[]> availableMoves, Board board) {
     	
+    	long startTime = System.currentTimeMillis();
+    	
     	// Create the root node representing current state of board.
     	// This is the initial state for minimax.
     	Node root = new Node(null, CrushUtilities.cloneBoard(board, 45), null);
@@ -108,8 +110,14 @@ public class MinMaxPlayer implements AbstractPlayer {
     	// Create the minimax tree to the depth defined by MINIMAX_DEPTH constant.
     	createMinimaxTree(root, MINIMAX_DEPTH, -Double.MAX_VALUE, Double.MAX_VALUE, true);
     	
+    	int[] cordsArray = findBestMove(root).toCordsArray(); 
+    	
+    	long endTime = System.currentTimeMillis();
+    	
+    	System.out.println("Time to find a move: " + (endTime - startTime) + "ms");
+    	
     	// Return the highest scoring move out of minimax tree.
-    	return findBestMove(root).toCordsArray();
+    	return cordsArray;
     }   
 
    
@@ -279,7 +287,7 @@ public class MinMaxPlayer implements AbstractPlayer {
      * 		   to 1.  
      */
     private double doFixedEvaluation(int remainingDepth) {
-    	if (remainingDepth <= 1) return 4.0;
-    	else return 3.0;
+    	if (remainingDepth <= 1) return 0.0;
+    	else return 0.0;
     }    
 }
