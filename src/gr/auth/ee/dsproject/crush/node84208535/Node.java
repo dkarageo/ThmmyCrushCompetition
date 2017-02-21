@@ -39,15 +39,17 @@ import gr.auth.ee.dsproject.crush.player.move.PlayerMove;
  * -public void addChild(Node child) throws NullNodeRuntimeException
  * -public void createChildren()
  * -public double evaluate(boolean negative)
+ * -public boolean leadsToExtraTurn() throws NonEvaluatedNodeException
  * 
  * Private methods defined in Node:
  * -private double doHeuristicEvaluation(Board board, PlayerMove move)
  * 
  * Exceptions defined in Node:
  * -public static class NullNodeRuntimeException extends RuntimeException
+ * -public static class NonEvaluatedNodeException extends RuntimeException
  * 
  * @author Dimitrios Karageorgiou
- * @version 0.3
+ * @version 0.4
  */
 public class Node {
 	
@@ -84,6 +86,18 @@ public class Node {
 	 */
 	private double nodeEvaluation;
 
+	/**
+	 * Indicates whether the move evaluated on this node, initiated
+	 * an extra turn for this player or not.
+	 */
+	private boolean extraTurn;
+	
+	/**
+	 * Indicates whether this node has been evaluated by calling evaluate()
+	 * method or not.
+	 */
+	private boolean hasEvaluated;
+	
 	
 //==== Public Constructors ====
 	
@@ -92,6 +106,8 @@ public class Node {
 	 */
 	public Node() {
 		children = new ArrayList<>();
+		extraTurn = false;
+		hasEvaluated = false;
 	}
 	
 	/**
@@ -249,15 +265,15 @@ public class Node {
 	 * 				node.
 	 * @throws NullNodeRuntimeException
 	 */
-	public void addChild(Node child) throws NullNodeRuntimeException 
-	{
+	public void addChild(Node child) throws NullNodeRuntimeException {
+		
 		if(child == null) throw new NullNodeRuntimeException();
 		
 		if (children == null) children = new ArrayList<>();
 		
 		children.add(child);
 	}
-	
+		
 	/**
      * Creates all the children of the current node.
      * 
@@ -302,7 +318,7 @@ public class Node {
 	 * 				   or negatively.
 	 * @return The evaluation in the form of a double.
 	 */
-	public double evaluate(boolean negative) {
+	public double evaluate(boolean negative) {	
 		
 		if (parent == null) {
     		// If parent is null, then no move lead to current state so
@@ -320,9 +336,30 @@ public class Node {
     		);
     	}
 		
+		// Set this node as evaluated.
+		hasEvaluated = true;
+		
 		return nodeEvaluation;
 	}
 
+	/**
+	 * Returns true if player is granted an extra turn after doing
+	 * the move associated with this node. 
+	 * 
+	 * If node has not been evaluated yet, a NonEvaluatedNodeException
+	 * is thrown.
+	 * 
+	 * @return True if player is granted an extra turn after doing
+	 * 		   the associated move, else false.
+	 * @throws NonEvaluatedNodeException
+	 */
+	public boolean leadsToExtraTurn() throws NonEvaluatedNodeException {
+		
+		if (!hasEvaluated) throw new NonEvaluatedNodeException();
+		
+		return extraTurn;
+	}
+	
 	
 //==== Private methods ====
 	
@@ -342,10 +379,19 @@ public class Node {
     	
     	HeuristicsEngine engine = new HeuristicsEngine(new SliderMathModel(1.7));
     	
-    	engine.add(new CandiesRemovedHeuristic(move, board), SliderMathModel.VERY_HIGH);
+    	CandiesRemovedHeuristic candyHeur = new CandiesRemovedHeuristic(move, board);
+    	
+    	engine.add(candyHeur, SliderMathModel.VERY_HIGH);
     	engine.add(new DistanceFromTopHeuristic(move, board), SliderMathModel.VERY_LOW);
     	
-    	return engine.evaluate();
+    	double score = engine.evaluate(); 
+    	
+    	// Check whether this move initiates an extra turn.
+    	// Ugly, ugly, ugly... really ugly, but no time to
+    	// implement proper actions and listeners...
+    	extraTurn = candyHeur.causedAnExtraTurn();
+ 	
+    	return score;
     }
     
 	
@@ -356,6 +402,15 @@ public class Node {
 	 * shouldn't.
 	 */
 	public static class NullNodeRuntimeException extends RuntimeException {
+		private static final long serialVersionUID = 1L;
+	}
+	
+	/**
+	 * An exception to be thrown when access to data that are valid only
+	 * after node evaluation has taken place is asked, though evaluation
+	 * has not happened yet.
+	 */
+	public static class NonEvaluatedNodeException extends RuntimeException {
 		private static final long serialVersionUID = 1L;
 	}
 }
