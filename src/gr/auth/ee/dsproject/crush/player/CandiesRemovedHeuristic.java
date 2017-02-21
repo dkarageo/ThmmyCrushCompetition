@@ -68,13 +68,28 @@ public class CandiesRemovedHeuristic extends Heuristic {
 	 */
 	private Board board;
 	
+	/**
+	 * An indicator that indicates whether the move the player did,
+	 * initiates an extra turn for him or not.
+	 */
+	private boolean extraTurn;
+	
+	/**
+	 * An indicator that indicates whether evaluate() method has been
+	 * called on this instance or not.
+	 */
+	private boolean hasEvaluated;
+	
 	
 // ==== Public Constructors ====
 	
 	/**
 	 * Create a new empty CandiesRemovedHeuristic.
 	 */
-	public CandiesRemovedHeuristic() {}
+	public CandiesRemovedHeuristic() {
+		extraTurn = false;
+		hasEvaluated = false;
+	}
 	
 	/**
 	 * Create a new CandiesRemovedHeuristic with a player's move
@@ -85,6 +100,7 @@ public class CandiesRemovedHeuristic extends Heuristic {
 	 * 				evaluated.
 	 */
 	public CandiesRemovedHeuristic(PlayerMove move, Board board) {
+		this();
 		this.move = move;
 		this.board = board;
 	}
@@ -158,6 +174,8 @@ public class CandiesRemovedHeuristic extends Heuristic {
 				CrushUtilities.boardAfterFirstCrush(board, move.toDirArray()), 1.0
 		);
 		
+		hasEvaluated = true;
+		
 		return score;
 	}
 		
@@ -166,6 +184,9 @@ public class CandiesRemovedHeuristic extends Heuristic {
 	 * specified by instance variable move. Only candies that being
 	 * removed directly when the move is done are contained. Candies 
 	 * removed upon chain moves are not contained. 
+	 * 
+	 * Also sets the indicator about whether this move is going to initiate
+	 * an extra turn for the player who did it. 
 	 *  
 	 * @return Set of candies on board object defined by instance
 	 * variable board to be removed after move. The two tiles that
@@ -203,34 +224,56 @@ public class CandiesRemovedHeuristic extends Heuristic {
 		// at least a 3-in-a-row to crush.
 		tilesForRemoval = BoardUtils.findTilesThatCrush(tilesForRemoval);
 		
-		// And now find the actual tile objects of the real board,
-		// that corresponds to the ones in the copy. This is the set
-		// to be returned.
-		Set<Tile> removedOnActualBoard = new HashSet<>();
+		// Use the calculated data here to check that this move is going
+		// to initiate an extra move.
+		extraTurn = BoardUtils.containsAFiveLineOrAnL(tilesForRemoval);
+			
+//		// And now find the actual tile objects of the real board,
+//		// that corresponds to the ones in the copy. This is the set
+//		// to be returned.
+//		Set<Tile> removedOnActualBoard = new HashSet<>();
+//		
+//		// If the first tile after move doesn't have adjacent tiles,
+//		// remove the second tile, in order to use the remaining cords
+//		// to match the removed tiles on the real board. Do the opposite
+//		// for the second tile.
+//		if(tilesForRemoval.contains(afterMoveTiles[0]) && 
+//		   !tilesForRemoval.contains(afterMoveTiles[1])) 
+//		{		
+//			tilesForRemoval.add(afterMoveTiles[1]);
+//			tilesForRemoval.remove(afterMoveTiles[0]);
+//		} 
+//		else if (tilesForRemoval.contains(afterMoveTiles[1]) &&
+//				 !tilesForRemoval.contains(afterMoveTiles[0])) 
+//		{
+//			tilesForRemoval.add(afterMoveTiles[0]);
+//			tilesForRemoval.remove(afterMoveTiles[1]);
+//		}
+//		
+//		// Match the tiles to the ones on the real board.
+//		for (Tile t : tilesForRemoval) {
+//			removedOnActualBoard.add(board.giveTileAt(t.getX(), t.getY()));
+//		}
 		
-		// If the first tile after move doesn't have adjacent tiles,
-		// remove the second tile, in order to use the remaining cords
-		// to match the removed tiles on the real board. Do the opposite
-		// for the second tile.
-		if(tilesForRemoval.contains(afterMoveTiles[0]) && 
-		   !tilesForRemoval.contains(afterMoveTiles[1])) 
-		{		
-			tilesForRemoval.add(afterMoveTiles[1]);
-			tilesForRemoval.remove(afterMoveTiles[0]);
-		} 
-		else if (tilesForRemoval.contains(afterMoveTiles[1]) &&
-				 !tilesForRemoval.contains(afterMoveTiles[0])) 
-		{
-			tilesForRemoval.add(afterMoveTiles[0]);
-			tilesForRemoval.remove(afterMoveTiles[1]);
-		}
+		return tilesForRemoval;
+	}
+	
+	/**
+	 * Returns true if the evaluation of this move caused an extra turn
+	 * to be initiated for the player who did it.
+	 * 
+	 * This method should only be used after evaluate() method of this
+	 * heuristic has been called. In any other case, a
+	 * NonEvaluatedHeuristicException is thrown.
+	 * 
+	 * @return True if an extra move is initiated, else false.
+	 * @throws NonEvaluatedHeuristicException
+	 */
+	public boolean causedAnExtraTurn() throws NonEvaluatedHeuristicException
+	{
+		if (!hasEvaluated) throw new NonEvaluatedHeuristicException();
 		
-		// Match the tiles to the ones on the real board.
-		for (Tile t : tilesForRemoval) {
-			removedOnActualBoard.add(board.giveTileAt(t.getX(), t.getY()));
-		}
-		
-		return removedOnActualBoard;
+		return extraTurn;
 	}
 	
 	/**
@@ -277,6 +320,19 @@ public class CandiesRemovedHeuristic extends Heuristic {
 			return 0;
 		}
 	}
+
+	
+// ==== Exceptions defined in CandiesRemovedHeuristic ====
+	
+	/**
+	 * An exception to be thrown when an element of this heuristic is tried
+	 * to be accessed, but it is not ready yet, because heuristic has not
+	 * been evaluated.
+	 */
+	public static class NonEvaluatedHeuristicException extends RuntimeException {
+		private static final long serialVersionUID = 1L;
+	}
+	
 	
 // ==== Unused Code ====
 //	

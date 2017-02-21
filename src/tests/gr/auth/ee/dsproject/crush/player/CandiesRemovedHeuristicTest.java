@@ -452,6 +452,157 @@ public class CandiesRemovedHeuristicTest {
 		assertEquals(score, heur.evaluate(), 0.001);
 	}
 	
+	@Test
+	public void testCausedAnExtraTurnException() {
+		int[][] boardScheme = {
+				{ 0, 1, 2, 3, 3, 5, 3, 5, 5, 2 },
+				{ 1, 2, 3, 4, 5, 6, 0, 1, 2, 3 },
+				{ 2, 3, 4, 5, 6, 0, 1, 2, 3, 4 },
+				{ 3, 4, 5, 6, 0, 1, 2, 3, 4, 5 },
+				{ 4, 5, 6, 0, 1, 2, 3, 4, 5, 6 },
+				{ 5, 6, 0, 1, 2, 3, 4, 5, 6, 0 },
+				{ 0, 1, 2, 3, 4, 5, 6, 0, 1, 2 },
+				{ 1, 2, 3, 4, 5, 6, 0, 1, 2, 3 },
+				{ 2, 3, 4, 5, 6, 0, 1, 2, 3, 4 },
+				{ 3, 4, 5, 6, 0, 1, 2, 3, 4, 5 }, 
+		};
+		
+		Board board = createBoard(boardScheme);
+		PlayerMove move = new PlayerMove(board.giveTileAt(5, 9), board.giveTileAt(6, 9));
+		
+		CandiesRemovedHeuristic heur = new CandiesRemovedHeuristic(move, board);
+		
+		boolean ex = false;
+		
+		try {
+			heur.causedAnExtraTurn();
+		} catch (CandiesRemovedHeuristic.NonEvaluatedHeuristicException e) {
+			ex = true;
+		}
+		
+		assertTrue(ex);
+	}
+	
+	@Test
+	public void testCausedAnExtraTurn1() {
+		int[][] boardScheme = {
+				{ 0, 1, 2, 3, 3, 5, 3, 5, 5, 2 },
+				{ 1, 2, 3, 4, 5, 6, 0, 1, 2, 3 },
+				{ 2, 3, 4, 5, 6, 0, 1, 2, 3, 4 },
+				{ 3, 4, 5, 6, 0, 1, 2, 3, 4, 5 },
+				{ 4, 5, 6, 0, 1, 2, 3, 4, 5, 6 },
+				{ 5, 6, 0, 1, 2, 3, 4, 5, 6, 0 },
+				{ 0, 1, 2, 3, 4, 5, 6, 0, 1, 2 },
+				{ 1, 2, 3, 4, 5, 6, 0, 1, 2, 3 },
+				{ 2, 3, 4, 5, 6, 0, 1, 2, 3, 4 },
+				{ 3, 4, 5, 6, 0, 1, 2, 3, 4, 5 }, 
+		};
+		
+		Board board = createBoard(boardScheme);
+		PlayerMove move = new PlayerMove(board.giveTileAt(5, 9), board.giveTileAt(6, 9));
+		
+		CandiesRemovedHeuristic heur = new CandiesRemovedHeuristic(move, board);
+		heur.evaluate();
+		
+		assertTrue(heur.causedAnExtraTurn());
+	}
+	
+	@Test
+	public void testCausedAnExtraTurn2() {
+		int[][] boardScheme = {
+				{ 0, 1, 2, 3, 4, 5, 6, 0, 1, 2 },
+				{ 1, 2, 3, 4, 5, 6, 0, 1, 2, 3 },
+				{ 2, 3, 4, 4, 6, 0, 1, 2, 3, 4 },
+				{ 3, 4, 5, 6, 0, 1, 2, 3, 4, 5 },
+				{ 4, 5, 6, 4, 1, 2, 3, 4, 5, 6 },
+				{ 5, 6, 0, 6, 2, 3, 4, 5, 6, 0 },
+				{ 0, 1, 2, 6, 4, 5, 6, 0, 1, 2 },
+				{ 1, 2, 3, 4, 5, 6, 0, 1, 2, 3 },
+				{ 2, 3, 4, 5, 6, 0, 1, 2, 3, 4 },
+				{ 3, 4, 5, 6, 0, 1, 2, 3, 4, 5 }, 
+		};
+		
+		Board board = createBoard(boardScheme);
+		PlayerMove move = new PlayerMove(board.giveTileAt(3, 5), board.giveTileAt(3, 6));
+		
+		CandiesRemovedHeuristic heur = new CandiesRemovedHeuristic(move, board);
+		heur.evaluate();
+		
+		assertTrue(heur.causedAnExtraTurn());
+	}
+	
+	@Test
+	public void testCausedAnExtraTurn3() {
+		int[][] boardScheme = {
+				{ 0, 1, 2, 3, 4, 5, 6, 0, 1, 2 },
+				{ 1, 2, 3, 4, 5, 6, 0, 1, 2, 3 },
+				{ 2, 3, 4, 5, 6, 0, 1, 2, 3, 4 },
+				{ 3, 4, 5, 6, 0, 1, 3, 3, 4, 3 },
+				{ 4, 5, 6, 0, 1, 2, 3, 4, 3, 6 },
+				{ 5, 6, 0, 1, 2, 3, 4, 5, 3, 0 },
+				{ 0, 1, 2, 3, 4, 5, 6, 0, 1, 2 },
+				{ 1, 2, 3, 4, 5, 6, 0, 1, 2, 3 },
+				{ 2, 3, 4, 5, 6, 0, 1, 2, 3, 4 },
+				{ 3, 4, 5, 6, 0, 1, 2, 3, 4, 5 }, 
+		};
+		
+		Board board = createBoard(boardScheme);
+		PlayerMove move = new PlayerMove(board.giveTileAt(8, 6), board.giveTileAt(9, 6));
+		
+		CandiesRemovedHeuristic heur = new CandiesRemovedHeuristic(move, board);
+		heur.evaluate();
+		
+		assertTrue(heur.causedAnExtraTurn());
+	}
+	
+	@Test
+	public void testCausedAnExtraTurn4() {
+		int[][] boardScheme = {
+				{ 0, 1, 3, 3, 4, 5, 6, 0, 1, 2 },
+				{ 1, 2, 3, 4, 5, 6, 0, 1, 2, 3 },
+				{ 2, 3, 4, 5, 6, 0, 1, 2, 3, 4 },
+				{ 3, 4, 3, 6, 0, 1, 2, 3, 4, 5 },
+				{ 4, 5, 6, 0, 1, 2, 3, 4, 5, 6 },
+				{ 5, 6, 0, 1, 2, 3, 4, 5, 6, 0 },
+				{ 0, 1, 2, 3, 4, 5, 6, 0, 1, 2 },
+				{ 1, 2, 3, 4, 5, 6, 0, 1, 2, 3 },
+				{ 2, 3, 4, 5, 6, 0, 1, 2, 3, 4 },
+				{ 3, 4, 5, 6, 0, 1, 2, 3, 4, 5 }, 
+		};
+		
+		Board board = createBoard(boardScheme);
+		PlayerMove move = new PlayerMove(board.giveTileAt(2, 7), board.giveTileAt(2, 6));
+		
+		CandiesRemovedHeuristic heur = new CandiesRemovedHeuristic(move, board);
+		heur.evaluate();
+		
+		assertFalse(heur.causedAnExtraTurn());
+	}
+	
+	@Test
+	public void testCausedAnExtraTurn5() {
+		int[][] boardScheme = {
+				{ 0, 1, 2, 3, 4, 5, 6, 0, 1, 2 },
+				{ 1, 2, 3, 4, 5, 6, 0, 1, 2, 3 },
+				{ 2, 3, 4, 5, 4, 4, 1, 4, 3, 4 },
+				{ 3, 4, 5, 6, 0, 1, 4, 3, 4, 5 },
+				{ 4, 5, 6, 0, 1, 2, 3, 4, 5, 6 },
+				{ 5, 6, 0, 1, 2, 3, 4, 5, 6, 0 },
+				{ 0, 1, 2, 3, 4, 5, 6, 0, 1, 2 },
+				{ 1, 2, 3, 4, 5, 6, 0, 1, 2, 3 },
+				{ 2, 3, 4, 5, 6, 0, 1, 2, 3, 4 },
+				{ 3, 4, 5, 6, 0, 1, 2, 3, 4, 5 }, 
+		};
+		
+		Board board = createBoard(boardScheme);
+		PlayerMove move = new PlayerMove(board.giveTileAt(6, 7), board.giveTileAt(7, 7));
+		
+		CandiesRemovedHeuristic heur = new CandiesRemovedHeuristic(move, board);
+		heur.evaluate();
+		
+		assertFalse(heur.causedAnExtraTurn());
+	}
+	
 //==== Tests for legacy code ====
 //	
 //	@Test 
