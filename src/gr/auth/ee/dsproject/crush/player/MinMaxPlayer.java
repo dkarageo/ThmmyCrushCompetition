@@ -175,11 +175,11 @@ public class MinMaxPlayer implements AbstractPlayer {
     	if (parent != null) {
 	    	int totalDepth = parent.getNodeDepth() + 1;
     		n.setNodeDepth(totalDepth);
-	    	if (totalDepth > MINIMAX_DEPTH + 2) {
+	    	if (totalDepth > MINIMAX_DEPTH + 1) {
 	    		depth = 0; // Cut Off
 	    		
 	    		// DEBUG
-	    		System.out.println("Cut Off");
+//	    		System.out.println("Cut Off");
 	    	}	
     	}
 	    	
