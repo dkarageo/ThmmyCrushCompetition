@@ -149,6 +149,9 @@ public class Player84208535 implements AbstractPlayer {
     private double createMinimaxTree(Node n, int depth, double min, 
     								 double max, boolean maximizing) 
     {    	
+    	// DEBUG
+    	//System.out.println("Maximizing: " + maximizing);
+    	
     	// Find the evaluation of current state. Since this method is going
     	// to run one more time than depth, the evaluation here is the
     	// opposite than maximizing. This happens because the first call
@@ -161,6 +164,12 @@ public class Player84208535 implements AbstractPlayer {
     	// levels.
     	if (depth != 0) {
     		n.createChildren();
+    		
+    		// Checks whether the move associated to current node leads to an
+    		// extra turn for current player.
+    		boolean extraTurn = n.leadsToExtraTurn();
+    		if (!extraTurn) depth--; // On extra turn, add 1 more level to minimax
+    								 // because current one is going 
     		
     		if (n.getChildren().size() == 0 ) {
     			// If known available moves on the board have been 
@@ -179,8 +188,13 @@ public class Player84208535 implements AbstractPlayer {
     		if (maximizing) {
     			double cMax = -Double.MAX_VALUE;
     			
-    			for (Node child : n.getChildren()) {
-    				double eval = createMinimaxTree(child, depth - 1, cMax, max, false);
+//    			// DEBUG
+//				if(extraTurn) {
+//					System.out.println("Current Maximizing: " + maximizing + " and Next Maximizing: " + extraTurn);
+//				}
+    			
+    			for (Node child : n.getChildren()) {    				    				
+    				double eval = createMinimaxTree(child, depth, cMax, max, extraTurn);
     				
     				cMax = Math.max(cMax, eval);
     				
@@ -194,9 +208,14 @@ public class Player84208535 implements AbstractPlayer {
     			
     		} else {
     			double cMin = Double.MAX_VALUE;
-    			
-    			for (Node child : n.getChildren()) {
-    				double eval = createMinimaxTree(child, depth - 1, cMin, max, true);
+
+//				// DEBUG
+//    			if(extraTurn) {
+//					System.out.println("Current Maximizing: " + maximizing + " and Next Maximizing: " + !extraTurn);
+//				}
+				
+    			for (Node child : n.getChildren()) {    				
+    				double eval = createMinimaxTree(child, depth, cMin, max, !extraTurn);
     				
     				cMin = Math.min(cMin, eval);
     				
@@ -254,12 +273,12 @@ public class Player84208535 implements AbstractPlayer {
      * 
      * @param remainingDepth The remaining levels the minimax cannot
      * 						 evaluate due to absence of data.
-     * @return A double of value 12.0 for remaining depths greater or equal 
-     * 		   to 2, and of value 20.0 for remaining depths lesser or equal
+     * @return A double of value 3.0 for remaining depths greater or equal 
+     * 		   to 2, and of value 4.0 for remaining depths lesser or equal
      * 		   to 1.  
      */
     private double doFixedEvaluation(int remainingDepth) {
-    	if (remainingDepth <= 1) return 20.0;
-    	else return 12.0;
+    	if (remainingDepth <= 1) return 4.0;
+    	else return 3.0;
     }    
 }
