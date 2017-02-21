@@ -9,7 +9,7 @@ import java.util.*;
 import org.junit.Test;
 
 import gr.auth.ee.dsproject.crush.board.*;
-import gr.auth.ee.dsproject.crush.node84208535.*;
+import gr.auth.ee.dsproject.crush.node.*;
 import gr.auth.ee.dsproject.crush.player.move.*;
 
 

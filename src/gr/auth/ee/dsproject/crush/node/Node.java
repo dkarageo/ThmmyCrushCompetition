@@ -1,4 +1,4 @@
-package gr.auth.ee.dsproject.crush.node84208535;
+package gr.auth.ee.dsproject.crush.node;
 
 import java.util.ArrayList;
 

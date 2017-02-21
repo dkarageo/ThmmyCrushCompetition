@@ -1,10 +1,11 @@
-package gr.auth.ee.dsproject.crush.node84208535;
+package gr.auth.ee.dsproject.crush.player;
 
 import java.util.ArrayList;
 
 import gr.auth.ee.dsproject.crush.board.Board;
 import gr.auth.ee.dsproject.crush.board.CrushUtilities;
 import gr.auth.ee.dsproject.crush.defplayers.AbstractPlayer;
+import gr.auth.ee.dsproject.crush.node.Node;
 import gr.auth.ee.dsproject.crush.player.move.PlayerMove;
 
 
@@ -33,7 +34,7 @@ import gr.auth.ee.dsproject.crush.player.move.PlayerMove;
  * @author Dimitrios Karageorgiou
  * @version 0.3
  */
-public class Player84208535 implements AbstractPlayer {
+public class MinMaxPlayer implements AbstractPlayer {
 
 //==== Public Constants ====
 	
@@ -52,7 +53,7 @@ public class Player84208535 implements AbstractPlayer {
     
 //==== Public Constructors ====
     
-    public Player84208535(Integer pid) {
+    public MinMaxPlayer(Integer pid) {
     	
     	name = "dkgr_ser_8420_polizois_8535";
     	id = pid;

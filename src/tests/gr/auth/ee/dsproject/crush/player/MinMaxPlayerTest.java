@@ -7,7 +7,7 @@ import java.lang.reflect.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import gr.auth.ee.dsproject.crush.node84208535.Player84208535;
+import gr.auth.ee.dsproject.crush.player.MinMaxPlayer;
 
 
 public class MinMaxPlayerTest {
@@ -18,7 +18,7 @@ public class MinMaxPlayerTest {
 
 	@Test
 	public void testDoFixedEvaluation() {
-		Player84208535 mPlayer = new Player84208535(0);
+		MinMaxPlayer mPlayer = new MinMaxPlayer(0);
 		
 		Method doFixedEvaluation = null;
 		
