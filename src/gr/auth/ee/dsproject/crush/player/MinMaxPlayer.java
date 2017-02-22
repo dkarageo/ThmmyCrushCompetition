@@ -101,7 +101,7 @@ public class MinMaxPlayer implements AbstractPlayer {
      */
     public int[] getNextMove(ArrayList<int[]> availableMoves, Board board) {
     	
-    	long startTime = System.currentTimeMillis();
+//    	long startTime = System.currentTimeMillis();
     	
     	// Create the root node representing current state of board.
     	// This is the initial state for minimax.
@@ -112,9 +112,9 @@ public class MinMaxPlayer implements AbstractPlayer {
     	
     	int[] cordsArray = findBestMove(root).toCordsArray(); 
     	
-    	long endTime = System.currentTimeMillis();
+//    	long endTime = System.currentTimeMillis();
     	
-    	System.out.println("Time to find a move: " + (endTime - startTime) + "ms");
+//    	System.out.println("Time to find a move: " + (endTime - startTime) + "ms");
     	
     	// Return the highest scoring move out of minimax tree.
     	return cordsArray;

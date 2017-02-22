@@ -55,7 +55,7 @@ public class HeuristicPlayer implements AbstractPlayer {
     
     public HeuristicPlayer(Integer pid) {
     	
-    	name = "MinimaxOfDepth2";
+    	name = "MinimaxOnHeuristic";
     	id = pid;
         score = 0;
     }
@@ -101,20 +101,20 @@ public class HeuristicPlayer implements AbstractPlayer {
      */
     public int[] getNextMove(ArrayList<int[]> availableMoves, Board board) {
     	
-    	long startTime = System.currentTimeMillis();
+//    	long startTime = System.currentTimeMillis();
     	
     	// Create the root node representing current state of board.
     	// This is the initial state for minimax.
-    	Node root = new Node(null, CrushUtilities.cloneBoard(board, 45), null);
+    	Node root = new Node(null, CrushUtilities.cloneBoard(board, 33), null);
     	
     	// Create the minimax tree to the depth defined by MINIMAX_DEPTH constant.
     	createMinimaxTree(root, MINIMAX_DEPTH, -Double.MAX_VALUE, Double.MAX_VALUE, true);
     	
     	int[] cordsArray = findBestMove(root).toCordsArray(); 
     	
-    	long endTime = System.currentTimeMillis();
+//    	long endTime = System.currentTimeMillis();
     	
-    	System.out.println("Time to find a move 2: " + (endTime - startTime) + "ms");
+//    	System.out.println("Time to find a move 2: " + (endTime - startTime) + "ms");
     	
     	// Return the highest scoring move out of minimax tree.
     	return cordsArray;
@@ -302,8 +302,8 @@ public class HeuristicPlayer implements AbstractPlayer {
      * 		   to 1.  
      */
     private double doFixedEvaluation(int remainingDepth) {
-    	if (remainingDepth <= 1) return 8.0;
-    	else return 4.0;
+    	if (remainingDepth <= 1) return 15.0;
+    	else return 5.0;
     }    
 }
 
