@@ -149,10 +149,7 @@ public class MinMaxPlayer implements AbstractPlayer {
      */
     private double createMinimaxTree(Node n, int depth, double min, 
     								 double max, boolean maximizing) 
-    {    	
-    	// DEBUG
-    	//System.out.println("Maximizing: " + maximizing);
-    	
+    {    	    	
     	// Find the evaluation of current state. Since this method is going
     	// to run one more time than depth, the evaluation here is the
     	// opposite than maximizing. This happens because the first call
@@ -169,9 +166,6 @@ public class MinMaxPlayer implements AbstractPlayer {
     		n.setNodeDepth(totalDepth);
 	    	if (totalDepth > MINIMAX_DEPTH + 1) {
 	    		depth = 0; // Cut Off
-	    		
-	    		// DEBUG
-//	    		System.out.println("Cut Off");
 	    	}	
     	}
 	    	
@@ -193,8 +187,6 @@ public class MinMaxPlayer implements AbstractPlayer {
     			// do a fixed evaluation for the future moves that
     			// may exist on the actual board.
 
-//    			System.out.println("No moves found");
-    			
     			if (maximizing)	n.setNodeEvaluation(n.getNodeEvaluation() + doFixedEvaluation(depth));
         		else n.setNodeEvaluation(n.getNodeEvaluation() - doFixedEvaluation(depth));
     			
@@ -203,11 +195,6 @@ public class MinMaxPlayer implements AbstractPlayer {
     		
     		if (maximizing) {
     			double cMax = -Double.MAX_VALUE;
-    			
-//    			// DEBUG
-//				if(extraTurn) {
-//					System.out.println("Current Maximizing: " + maximizing + " and Next Maximizing: " + extraTurn);
-//				}
     			
     			for (Node child : n.getChildren()) {    				    				
     				double eval = createMinimaxTree(child, depth, cMax, max, extraTurn);
@@ -225,11 +212,6 @@ public class MinMaxPlayer implements AbstractPlayer {
     		} else {
     			double cMin = Double.MAX_VALUE;
 
-//				// DEBUG
-//    			if(extraTurn) {
-//					System.out.println("Current Maximizing: " + maximizing + " and Next Maximizing: " + !extraTurn);
-//				}
-				
     			for (Node child : n.getChildren()) {    				
     				double eval = createMinimaxTree(child, depth, cMin, max, !extraTurn);
     				
