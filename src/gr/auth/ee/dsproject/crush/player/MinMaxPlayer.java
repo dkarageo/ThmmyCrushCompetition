@@ -103,7 +103,7 @@ public class MinMaxPlayer implements AbstractPlayer {
     	
     	// Create the root node representing current state of board.
     	// This is the initial state for minimax.
-    	Node root = new Node(null, CrushUtilities.cloneBoard(board, 45), null);
+    	Node root = new Node(null, CrushUtilities.cloneBoard(board, 33), null);
     	
     	// Create the minimax tree to the depth defined by MINIMAX_DEPTH constant.
     	createMinimaxTree(root, MINIMAX_DEPTH, -Double.MAX_VALUE, Double.MAX_VALUE, true);
