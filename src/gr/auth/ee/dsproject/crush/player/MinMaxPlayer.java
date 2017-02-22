@@ -276,7 +276,7 @@ public class MinMaxPlayer implements AbstractPlayer {
      * 		   to 1.  
      */
     private double doFixedEvaluation(int remainingDepth) {
-    	if (remainingDepth <= 1) return 4.0;
-    	else return 3.0;
+    	if (remainingDepth <= 1) return 8.0;
+    	else return 4.0;
     }    
 }
