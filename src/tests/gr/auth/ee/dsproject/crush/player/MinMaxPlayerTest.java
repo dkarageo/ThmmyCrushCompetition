@@ -32,16 +32,16 @@ public class MinMaxPlayerTest {
 		
 		try {
 			// Test 0 remaining depth.
-			assertEquals(20.0, doFixedEvaluation.invoke(mPlayer, 0));
+			assertEquals(8.0, doFixedEvaluation.invoke(mPlayer, 0));
 			
 			// Test 1 remaining depth.
-			assertEquals(20.0, doFixedEvaluation.invoke(mPlayer, 1));
+			assertEquals(8.0, doFixedEvaluation.invoke(mPlayer, 1));
 			
 			// Test 2 remaining depth.
-			assertEquals(12.0, doFixedEvaluation.invoke(mPlayer, 2));
+			assertEquals(4.0, doFixedEvaluation.invoke(mPlayer, 2));
 			
 			// Test 3 remaining depth.
-			assertEquals(12.0, doFixedEvaluation.invoke(mPlayer, 3));
+			assertEquals(4.0, doFixedEvaluation.invoke(mPlayer, 3));
 			
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			e.printStackTrace();
