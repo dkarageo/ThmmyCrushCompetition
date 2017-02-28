@@ -228,34 +228,34 @@ public class CandiesRemovedHeuristic extends Heuristic {
 		// to initiate an extra move.
 		extraTurn = BoardUtils.containsAFiveLineOrAnL(tilesForRemoval);
 			
-//		// And now find the actual tile objects of the real board,
-//		// that corresponds to the ones in the copy. This is the set
-//		// to be returned.
-//		Set<Tile> removedOnActualBoard = new HashSet<>();
-//		
-//		// If the first tile after move doesn't have adjacent tiles,
-//		// remove the second tile, in order to use the remaining cords
-//		// to match the removed tiles on the real board. Do the opposite
-//		// for the second tile.
-//		if(tilesForRemoval.contains(afterMoveTiles[0]) && 
-//		   !tilesForRemoval.contains(afterMoveTiles[1])) 
-//		{		
-//			tilesForRemoval.add(afterMoveTiles[1]);
-//			tilesForRemoval.remove(afterMoveTiles[0]);
-//		} 
-//		else if (tilesForRemoval.contains(afterMoveTiles[1]) &&
-//				 !tilesForRemoval.contains(afterMoveTiles[0])) 
-//		{
-//			tilesForRemoval.add(afterMoveTiles[0]);
-//			tilesForRemoval.remove(afterMoveTiles[1]);
-//		}
-//		
-//		// Match the tiles to the ones on the real board.
-//		for (Tile t : tilesForRemoval) {
-//			removedOnActualBoard.add(board.giveTileAt(t.getX(), t.getY()));
-//		}
+		// And now find the actual tile objects of the real board,
+		// that corresponds to the ones in the copy. This is the set
+		// to be returned.
+		Set<Tile> removedOnActualBoard = new HashSet<>();
 		
-		return tilesForRemoval;
+		// If the first tile after move doesn't have adjacent tiles,
+		// remove the second tile, in order to use the remaining cords
+		// to match the removed tiles on the real board. Do the opposite
+		// for the second tile.
+		if(tilesForRemoval.contains(afterMoveTiles[0]) && 
+		   !tilesForRemoval.contains(afterMoveTiles[1])) 
+		{		
+			tilesForRemoval.add(afterMoveTiles[1]);
+			tilesForRemoval.remove(afterMoveTiles[0]);
+		} 
+		else if (tilesForRemoval.contains(afterMoveTiles[1]) &&
+				 !tilesForRemoval.contains(afterMoveTiles[0])) 
+		{
+			tilesForRemoval.add(afterMoveTiles[0]);
+			tilesForRemoval.remove(afterMoveTiles[1]);
+		}
+		
+		// Match the tiles to the ones on the real board.
+		for (Tile t : tilesForRemoval) {
+			removedOnActualBoard.add(board.giveTileAt(t.getX(), t.getY()));
+		}
+		
+		return removedOnActualBoard;
 	}
 	
 	/**
