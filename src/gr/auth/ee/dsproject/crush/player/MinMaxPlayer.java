@@ -171,27 +171,27 @@ public class MinMaxPlayer implements AbstractPlayer {
     	// It counts total depth, considering every extra turn. If it
     	// exceeds MINIMAX_DEPTH + 2, it just cuts off further searching
     	// no matter what.
-//		Node parent = n.getParent();
-//		if (parent != null) {
-//			int totalDepth = parent.getNodeDepth() + 1;
-//			n.setNodeDepth(totalDepth);
-//			if (totalDepth > MINIMAX_DEPTH + 1) {
-//				depth = 0; // Cut Off
-//			}	
-//		}
-	    	
-    	// If current node is not a leaf, then evaluate its children,
+
+//    	Node parent = n.getParent();
+//    	if (parent != null) {
+//	    	int totalDepth = parent.getNodeDepth() + 1;
+//    		n.setNodeDepth(totalDepth);
+//	    	if (totalDepth > MINIMAX_DEPTH + 1) {
+//	    		depth = 0; // Cut Off
+//	    	}	
+//    	}
+	    
+    	// Checks whether the move associated to current node leads to an
+		// extra turn for current player.
+		boolean extraTurn = n.leadsToExtraTurn();
+		if (extraTurn) depth++; // On extra turn, add 1 more level to minimax.
+
+		// If current node is not a leaf, then evaluate its children,
     	// and form the overall evaluation by using the ones from deeper
     	// levels.
     	if (depth != 0) {
     		n.createChildren();
-    		
-    		// Checks whether the move associated to current node leads to an
-    		// extra turn for current player.
-    		boolean extraTurn = n.leadsToExtraTurn();
-    		if (!extraTurn) depth--; // On extra turn, add 1 more level to minimax
-    								 // because current one is going 
-    		
+    		    		
     		if (n.getChildren().size() == 0 ) {
     			// If known available moves on the board have been 
     			// depleted and no further search can be done, then
@@ -215,7 +215,7 @@ public class MinMaxPlayer implements AbstractPlayer {
 //				}
     			
     			for (Node child : n.getChildren()) {    				    				
-    				double eval = createMinimaxTree(child, depth, cMax, max, extraTurn);
+    				double eval = createMinimaxTree(child, depth - 1, cMax, max, extraTurn);
     				
     				cMax = Math.max(cMax, eval);
     				
@@ -236,7 +236,7 @@ public class MinMaxPlayer implements AbstractPlayer {
 //				}
 				
     			for (Node child : n.getChildren()) {    				
-    				double eval = createMinimaxTree(child, depth, cMin, max, !extraTurn);
+    				double eval = createMinimaxTree(child, depth - 1, min, cMin, !extraTurn);
     				
     				cMin = Math.min(cMin, eval);
     				
